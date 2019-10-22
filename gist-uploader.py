@@ -18,11 +18,8 @@ if __name__ == '__main__':
         f = open(sys.argv[1], "r")
         fileName = "default-name"
 
-        try:
-            fileName = f.name[f.name.rindex("/") + 1:]
-        except ValueError as ex:
-            fileName = f.name
-            # print(ex)
+        if str(f.name).find(os.path.sep) != -1:
+            fileName = f.name[f.name.rindex(os.path.sep) + 1:]
 
         data["files"] = {fileName: {"content": str(f.read())}}
     else:
@@ -41,5 +38,5 @@ if __name__ == '__main__':
     # print(output.headers)
     output = output.json()
     # print(output)
-    print("https://gist.github.com//" + output['owner']['login'] + "//" + output['id'])
+    print("https://gist.github.com/" + output['owner']['login'] + "/" + output['id'])
     clipboard.copy("https://gist.github.com/" + output['owner']['login'] + "/" + output['id'])
