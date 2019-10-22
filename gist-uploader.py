@@ -11,16 +11,23 @@ if __name__ == '__main__':
         "files": {}
     }
 
-    f = open(sys.argv[1], "r")
-    fileName = "default-name"
+    cp = str(clipboard.paste())
+    if cp.startswith("github:") and len(sys.argv) < 2:
+        data["files"] = {"clipboard": {"content": cp[7:]}}
+    elif len(sys.argv) > 1:
+        f = open(sys.argv[1], "r")
+        fileName = "default-name"
 
-    try:
-        fileName = f.name[f.name.rindex("/") + 1:]
-    except ValueError as ex:
-        fileName = f.name
-        # print(ex)
+        try:
+            fileName = f.name[f.name.rindex("/") + 1:]
+        except ValueError as ex:
+            fileName = f.name
+            # print(ex)
 
-    data["files"] = {fileName: {"content": str(f.read())}}
+        data["files"] = {fileName: {"content": str(f.read())}}
+    else:
+        print("Wrong args were given.")
+        exit(0)
 
     # print(data)
     token = os.getenv("GIST_TOKEN")
@@ -34,7 +41,5 @@ if __name__ == '__main__':
     # print(output.headers)
     output = output.json()
     # print(output)
-    print("https://gist.github.com//"+output['owner']['login']+"//"+output['id'])
-
-    clipboard.copy("https://gist.github.com/"+output['owner']['login']+"/"+output['id'])
-
+    print("https://gist.github.com//" + output['owner']['login'] + "//" + output['id'])
+    clipboard.copy("https://gist.github.com/" + output['owner']['login'] + "/" + output['id'])
