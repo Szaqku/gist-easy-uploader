@@ -23,20 +23,23 @@ if __name__ == '__main__':
 
         data["files"] = {fileName: {"content": str(f.read())}}
     else:
-        print("Wrong args were given.")
+        print("Wrong input was given.")
         exit(0)
 
-    # print(data)
     token = os.getenv("GIST_TOKEN")
     if token is None:
         raise EnvironmentError("Can't find GIST_TOKEN env variable.")
-    # print(token)
-    output = requests.request('post', 'https://api.github.com/gists', json=data,
-                              headers={"Accept": "application/vnd.github.v3+json",
-                                       "Authorization": "token " + token})
 
-    # print(output.headers)
-    output = output.json()
-    # print(output)
-    print("https://gist.github.com/" + output['owner']['login'] + "/" + output['id'])
-    clipboard.copy("https://gist.github.com/" + output['owner']['login'] + "/" + output['id'])
+    response = requests.request('post', 'https://api.github.com/gists', json=data,
+                                headers={"Accept": "application/vnd.github.v3+json",
+                                         "Authorization": "token " + token})
+
+    if response.status_code != 201:
+        print(response.content)
+        input("Press ENTER to close window.")
+        exit()
+
+    response = response.json()
+    print("https://gist.github.com/" + response['owner']['login'] + "/" + response['id'])
+    clipboard.copy("https://gist.github.com/" + response['owner']['login'] + "/" + response['id'])
+    input("Link to just created gist has been copied to your clipboard.\nPress ENTER to close window.")
