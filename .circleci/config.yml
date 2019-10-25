@@ -1,0 +1,40 @@
+version: 2.0
+jobs:
+  build:
+    working_directory: ~/tmp
+    docker:
+#      - image: circleci/python:3.7
+#        environment:
+#          PIPENV_VENV_IN_PROJECT: true
+      - image: scottyhardy/docker-wine
+    steps:
+      - checkout  # checkout source code to working directory
+      - run:
+          command: |
+            cd ~/tmp
+            pwd
+            docker-wine winetricks python37
+            ls -R
+      - run:
+          command: |  # use pipenv to install dependencies
+            sudo pip install pipenv
+            pipenv install
+      - run:
+          command: |
+            echo "Hello World"
+            export PYTHONPATH="."
+            pwd
+            ls -R
+      - run:
+          command: |
+            pipenv install auto-py-to-exe
+            pipenv install pyinstaller
+      - run:
+          command: |
+            pwd
+            ./.venv/bin/pyinstaller -y -F  "src/gist-uploader.py"
+            ls -R
+      - store_artifacts:
+          path: ~/tmp/dist/gist-uploader
+      - store_artifacts:
+          path: ~/tmp/build/gist-uploader
